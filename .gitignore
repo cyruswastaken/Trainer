@@ -1,0 +1,52 @@
+# --- Visual Studio ---
+.vs/
+*.VC.db
+*.VC.VC.opendb
+*.suo
+*.user
+*.userosscache
+*.sdf
+*.ipch
+*.opensdf
+*.ncb
+*.log
+
+# --- Build directories ---
+Debug/
+Release/
+x64/
+x86/
+*.obj
+*.pch
+*.pdb
+*.idb
+*.ilk
+*.exe
+*.dll
+*.lib
+*.exp
+
+# --- SDL DLLs ---
+SDL2.dll
+
+# --- CMake / Build System Caches ---
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# --- Misc ---
+*.tlog
+*.lastbuildstate
+*.db
+*.pyc
+*.class
+*.sln.docstates
+
+# --- OS-specific ---
+.DS_Store
+Thumbs.db
+
+# --- Git-related ---
+*.orig
+*.rej
