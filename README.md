@@ -34,23 +34,6 @@ A lightweight aim training game built using **SDL2** and **C++**. Inspired by ga
 
 > ✅ SDL2 should be configured with include/lib paths in your Visual Studio project.
 
-### Folder Structure
-Trainer/
-├── assets/
-│ ├── images/
-│ ├── fonts/
-│ └── audio/
-├── include/
-│ └── Target.h
-├── src/
-│ ├── Target.cpp
-│ └── main.cpp
-├── .gitignore
-├── Trainer.sln
-├── Trainer.vcxproj
-└── README.md
-
-
 ---
 
 ## 🧑‍💻 Building
