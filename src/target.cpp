@@ -1,22 +1,44 @@
 #include "target.h"
+#include <SDL_image.h>
 #include <iostream>
 
-Target::Target(int width, int height)
-{
-	rect.w = width;
-	rect.h = height;
-	rect.x = 0;
-	rect.y = 0;
+Target::Target(int width, int height) {
+    rect.w = width;
+    rect.h = height;
+    rect.x = 0;
+    rect.y = 0;
+    texture = nullptr;
 }
 
+Target::~Target() {
+    if (texture) {
+        SDL_DestroyTexture(texture);
+    }
+}
+
+bool Target::loadTexture(SDL_Renderer* renderer, const char* file) {
+    SDL_Surface* surface = IMG_Load(file);
+    if (!surface) {
+        std::cerr << "IMG_Load failed: " << IMG_GetError() << std::endl;
+        return false;
+    }
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    if (!texture) {
+        std::cerr << "SDL_CreateTextureFromSurface failed: " << SDL_GetError() << std::endl;
+        return false;
+    }
+    return true;
+}
 
 void Target::randomize(int screenWidth, int screenHeight) {
-	rect.x = rand() % (screenWidth - rect.w);
-	rect.y = rand() % (screenHeight - rect.h);
+    rect.x = rand() % (screenWidth - rect.w);
+    rect.y = rand() % (screenHeight - rect.h);
 }
 
-void Target::renderWindow(SDL_Renderer* renderer)
-{
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderFillRect(renderer, &rect);
+void Target::renderWindow(SDL_Renderer* renderer) {
+    if (texture) {
+        SDL_RenderCopy(renderer, texture, nullptr, &rect);
+    }
 }
