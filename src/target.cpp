@@ -1,19 +1,12 @@
 #include "target.h"
 #include <SDL_image.h>
 #include <iostream>
+#include <cstdlib>
 
-Target::Target(int width, int height) {
-    rect.w = width;
-    rect.h = height;
-    rect.x = 0;
-    rect.y = 0;
-    texture = nullptr;
-}
+Target::Target(int width, int height) : rect{0, 0, width, height}, texture(nullptr) {}
 
 Target::~Target() {
-    if (texture) {
-        SDL_DestroyTexture(texture);
-    }
+    if (texture) SDL_DestroyTexture(texture);
 }
 
 bool Target::loadTexture(SDL_Renderer* renderer, const char* file) {
@@ -24,7 +17,6 @@ bool Target::loadTexture(SDL_Renderer* renderer, const char* file) {
     }
     texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
-
     if (!texture) {
         std::cerr << "SDL_CreateTextureFromSurface failed: " << SDL_GetError() << std::endl;
         return false;
@@ -37,8 +29,6 @@ void Target::randomize(int screenWidth, int screenHeight) {
     rect.y = rand() % (screenHeight - rect.h);
 }
 
-void Target::renderWindow(SDL_Renderer* renderer) {
-    if (texture) {
-        SDL_RenderCopy(renderer, texture, nullptr, &rect);
-    }
+void Target::render(SDL_Renderer* renderer) const {
+    if (texture) SDL_RenderCopy(renderer, texture, nullptr, &rect);
 }

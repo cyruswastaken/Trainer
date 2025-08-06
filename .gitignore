@@ -1,5 +1,6 @@
 # --- Visual Studio ---
 .vs/
+*.vscode
 *.VC.db
 *.VC.VC.opendb
 *.suo
