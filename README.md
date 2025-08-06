@@ -74,6 +74,5 @@ A lightweight aim training game built using **SDL2** and **C++**. Inspired by ga
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
 
 
