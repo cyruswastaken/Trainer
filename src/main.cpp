@@ -5,6 +5,11 @@
 #include <cstdlib>
 #include <ctime>
 
+
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_sdlrenderer2.h"
+
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 const int BALL_SIZE = 32;
@@ -40,6 +45,16 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer2_Init(renderer);
+
     SDL_Surface* surface = IMG_Load("assets/images/ball.png");
     if (!surface) {
         std::cerr << "Failed to load image: " << IMG_GetError() << std::endl;
@@ -67,42 +82,113 @@ int main(int argc, char* argv[]) {
         BALL_SIZE, BALL_SIZE
     };
 
+ 
     int score = 0;
     bool running = true;
+    bool show_menu = true; 
+    bool show_settings = false;
+
     SDL_Event event;
 
     while (running) {
+        
         while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
                 running = false;
 
             if (event.type == SDL_MOUSEBUTTONDOWN &&
                 event.button.button == SDL_BUTTON_LEFT) {
-                int mouseX = event.button.x;
-                int mouseY = event.button.y;
 
-                if (mouseX >= targetRect.x && mouseX <= targetRect.x + targetRect.w &&
-                    mouseY >= targetRect.y && mouseY <= targetRect.y + targetRect.h) {
+                
+                if (!io.WantCaptureMouse && !show_menu) {
+                    int mouseX = event.button.x;
+                    int mouseY = event.button.y;
 
+                    if (mouseX >= targetRect.x && mouseX <= targetRect.x + targetRect.w &&
+                        mouseY >= targetRect.y && mouseY <= targetRect.y + targetRect.h) {
 
-                    int winW, winH;
-                    SDL_GetWindowSize(window, &winW, &winH);
-                    targetRect.x = rand() % (winW - BALL_SIZE);
-                    targetRect.y = rand() % (winH - BALL_SIZE);
+                        int winW, winH;
+                        SDL_GetWindowSize(window, &winW, &winH);
+                        targetRect.x = rand() % (winW - BALL_SIZE);
+                        targetRect.y = rand() % (winH - BALL_SIZE);
 
-
-                    score++;
-                    Mix_PlayChannel(-1, hitSound, 0);
-                    std::cout << "Score: " << score << std::endl;
+                        score++;
+                        Mix_PlayChannel(-1, hitSound, 0);
+                        std::cout << "Score: " << score << std::endl;
+                    }
                 }
             }
         }
 
+        
+        ImGui_ImplSDLRenderer2_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
+        
+        if (show_menu) {
+            ImGui::Begin("Aim Trainer Menu");
+            ImGui::SetWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
+            ImGui::Text("Welcome to the Aim Trainer!");
+            ImGui::Separator();
+            if (ImGui::Button("Start Game", ImVec2(280, 0))) {
+                show_menu = false;
+                score = 0; 
+            }
+            if (ImGui::Button("Settings", ImVec2(280, 0))) {
+                show_settings = true;
+            }
+            if (ImGui::Button("Quit", ImVec2(280, 0))) {
+                running = false;
+            }
+            ImGui::End();
+        }
+
+        if (show_settings) {
+            ImGui::Begin("Settings", &show_settings);
+            ImGui::Text("Adjust game parameters here.");
+            ImGui::Separator();
+            static int target_size_slider = BALL_SIZE;
+            ImGui::SliderInt("Target Size", &target_size_slider, 16, 128, "%d pixels");
+            if (ImGui::Button("Apply")) {
+                
+                targetRect.w = target_size_slider;
+                targetRect.h = target_size_slider;
+            }
+            ImGui::End();
+        }
+
+        if (!show_menu) {
+            ImGui::Begin("Debug Window");
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            ImGui::Text("Current Score: %d", score);
+            ImGui::Text("Target Position: (%d, %d)", targetRect.x, targetRect.y);
+            if (ImGui::Button("Return to Menu")) {
+                show_menu = true;
+            }
+            ImGui::End();
+        }
+
+    
+        ImGui::Render();
         SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, ballTexture, nullptr, &targetRect);
+
+       
+        if (!show_menu) {
+            SDL_RenderCopy(renderer, ballTexture, nullptr, &targetRect);
+        }
+
+   
+        ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+
         SDL_RenderPresent(renderer);
     }
+
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 
     Mix_FreeChunk(hitSound);
     SDL_DestroyTexture(ballTexture);
