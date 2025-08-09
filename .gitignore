@@ -52,3 +52,10 @@ Thumbs.db
 # --- Git-related ---
 *.orig
 *.rej
+
+# --- Screenshots ---
+# Ignore all images except those in /screenshots/
+*.png
+*.jpg
+!screenshots/*.png
+!screenshots/*.jpg

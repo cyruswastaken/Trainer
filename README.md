@@ -1,6 +1,6 @@
 # 🎯 SDL2 Aim Trainer
 
-A lightweight aim training game built using **SDL2** and **C++**. Inspired by games like **Aim Lab**, this trainer helps you improve your reaction time and precision by clicking on fast-moving targets.
+A lightweight aim training game built using **SDL2** and **C++**. Inspired by games like **Aim Labs**, this trainer helps you improve your reaction time and precision by clicking on fast-moving targets.
 
 ---
 
@@ -16,12 +16,11 @@ A lightweight aim training game built using **SDL2** and **C++**. Inspired by ga
 
 ## 📸 Screenshots
 
-> **Coming soon...**
+**Startup Screen**  
+![Startup Screen](screenshots/startupScreen.png)
 
-- Target rendering
-- Cursor clicks
-- Score counter
-- Final screen preview
+**Debug Window**  
+![Debug Window](screenshots/debugWindow.png)
 
 ---
 
@@ -73,6 +72,3 @@ A lightweight aim training game built using **SDL2** and **C++**. Inspired by ga
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-
-
