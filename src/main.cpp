@@ -4,8 +4,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-
-
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
@@ -45,7 +43,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -82,25 +80,32 @@ int main(int argc, char* argv[]) {
         BALL_SIZE, BALL_SIZE
     };
 
- 
     int score = 0;
     bool running = true;
-    bool show_menu = true; 
+    bool show_menu = true;
     bool show_settings = false;
+    bool show_debug_window = false; 
 
     SDL_Event event;
 
     while (running) {
-        
+    
         while (SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
                 running = false;
 
+            if (event.type == SDL_KEYDOWN) {
+              
+                if (event.key.keysym.sym == SDLK_TAB) {
+                    show_debug_window = !show_debug_window;
+                }
+            }
+
             if (event.type == SDL_MOUSEBUTTONDOWN &&
                 event.button.button == SDL_BUTTON_LEFT) {
 
-                
+                // Only process game logic if the menu is not visible and ImGui is not consuming the mouse
                 if (!io.WantCaptureMouse && !show_menu) {
                     int mouseX = event.button.x;
                     int mouseY = event.button.y;
@@ -121,12 +126,14 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        
+       
         ImGui_ImplSDLRenderer2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        
+        // -------------------------------------------------------------
+        // ImGui UI Logic - Menu and Debug
+        // -------------------------------------------------------------
         if (show_menu) {
             ImGui::Begin("Aim Trainer Menu");
             ImGui::SetWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
@@ -134,7 +141,7 @@ int main(int argc, char* argv[]) {
             ImGui::Separator();
             if (ImGui::Button("Start Game", ImVec2(280, 0))) {
                 show_menu = false;
-                score = 0; 
+                score = 0;
             }
             if (ImGui::Button("Settings", ImVec2(280, 0))) {
                 show_settings = true;
@@ -152,15 +159,15 @@ int main(int argc, char* argv[]) {
             static int target_size_slider = BALL_SIZE;
             ImGui::SliderInt("Target Size", &target_size_slider, 16, 128, "%d pixels");
             if (ImGui::Button("Apply")) {
-                
                 targetRect.w = target_size_slider;
                 targetRect.h = target_size_slider;
             }
             ImGui::End();
         }
 
-        if (!show_menu) {
-            ImGui::Begin("Debug Window");
+        // The debug window is now conditional on both not being in the menu AND the 'Tab' key being pressed
+        if (!show_menu && show_debug_window) {
+            ImGui::Begin("Debug Window", &show_debug_window); // The &show_debug_window allows you to close it with the 'X' button
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::Text("Current Score: %d", score);
             ImGui::Text("Target Position: (%d, %d)", targetRect.x, targetRect.y);
@@ -170,22 +177,23 @@ int main(int argc, char* argv[]) {
             ImGui::End();
         }
 
-    
+        
         ImGui::Render();
         SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
         SDL_RenderClear(renderer);
 
-       
+      
         if (!show_menu) {
             SDL_RenderCopy(renderer, ballTexture, nullptr, &targetRect);
         }
 
-   
+       
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
 
         SDL_RenderPresent(renderer);
     }
 
+    // Cleanup
     ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
