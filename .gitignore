@@ -43,6 +43,7 @@ Makefile
 *.pyc
 *.class
 *.sln.docstates
+imgui.ini
 
 # --- OS-specific ---
 .DS_Store
